@@ -1,0 +1,77 @@
+name: C++ compile tester
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - '*'
+  release:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install C++ compilers
+        run: |
+          sudo apt install -y g++
+          sudo apt install -y clang
+          sudo apt install -y llvm
+
+      - name: Compile C++ code
+        run: |
+          success=false
+          # Compile with different C++ standards
+          if g++ -std=c++03 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc03; then
+            success=true
+          fi
+          if g++ -std=c++11 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc11; then
+            success=true
+          fi
+          if g++ -std=c++14 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc14; then
+            success=true
+          fi
+          if g++ -std=c++17 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc17; then
+            success=true
+          fi
+          if g++ -std=c++20 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc20; then
+            success=true
+          fi
+          if g++ -std=c++23 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc23; then
+            success=true
+          fi
+          if clang++ -std=c++03 -Wall -Wextra -Werror -pedantic -c main.cpp -o clang03; then
+            success=true
+          fi
+          if clang++ -std=c++11 -Wall -Wextra -Werror -pedantic -c main.cpp -o clang11; then
+            success=true
+          fi
+          if clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -c main.cpp -o clang14; then
+            success=true
+          fi
+          if clang++ -std=c++17 -Wall -Wextra -Werror -pedantic -c main.cpp -o clang17; then
+            success=true
+          fi
+          if clang++ -std=c++20 -Wall -Wextra -Werror -pedantic -c main.cpp -o clang20; then
+            success=true
+          fi
+          if clang++ -std=c++2b -Wall -Wextra -Werror -pedantic -c main.cpp -o clang23; then
+            success=true
+          fi
+          # Exit with a non-zero status if none of the compilations succeeded
+          if ! $success; then
+            exit 1
+          fi
+
+      - name: Upload build artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: .
